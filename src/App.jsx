@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-    import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+    import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
     import axios from 'axios';
 
     const App = () => {
@@ -7,6 +7,13 @@ import React, { useState, useEffect } from 'react';
       const [storageInfo, setStorageInfo] = useState(null);
 
       const clientId = '52105631476-p3vv0ff1rq96io2pp13ms7n947hdfg69.apps.googleusercontent.com';
+
+      const login = useGoogleLogin({
+        clientId: clientId,
+        scope: 'https://www.googleapis.com/auth/drive.readonly',
+        onSuccess: tokenResponse => setAccessToken(tokenResponse.access_token),
+        onError: () => console.log('Login Failed'),
+      });
 
       useEffect(() => {
         if (accessToken) {
@@ -35,15 +42,7 @@ import React, { useState, useEffect } from 'react';
           <h1>Google Drive Storage Info</h1>
           {!accessToken ? (
             <GoogleOAuthProvider clientId={clientId}>
-              <GoogleLogin
-                scope="https://www.googleapis.com/auth/drive.readonly"
-                onSuccess={credentialResponse => {
-                  setAccessToken(credentialResponse.credential);
-                }}
-                onError={() => {
-                  console.log('Login Failed');
-                }}
-              />
+              <button onClick={() => login()}>Sign in with Google</button>
             </GoogleOAuthProvider>
           ) : (
             <div>
